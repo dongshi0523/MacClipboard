@@ -148,6 +148,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         let host = NSHostingView(rootView: BallView(onTap: { [weak self] in
             self?.toggleHistory()
+        }, onQuit: {
+            NSApp.terminate(nil)
         }))
         host.frame = NSRect(x: 0, y: 0, width: 48, height: 48)
         host.autoresizingMask = [.width, .height]
@@ -198,6 +200,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             },
             onClear: { [weak self] in
                 self?.manager.clear()
+            },
+            onQuit: {
+                NSApp.terminate(nil)
             }
         ))
         host.frame = NSRect(x: 0, y: 0, width: 380, height: 520)
@@ -224,6 +229,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 struct BallView: View {
     var onTap: () -> Void
+    var onQuit: () -> Void
     @State private var hovered = false
 
     var body: some View {
@@ -257,6 +263,11 @@ struct BallView: View {
         }
         .buttonStyle(.plain)
         .onHover { hovered = $0 }
+        .contextMenu {
+            Button("退出 MacClipboard") {
+                onQuit()
+            }
+        }
     }
 }
 
@@ -265,6 +276,7 @@ struct HistoryView: View {
     var onSelect: (ClipboardEntry) -> Void
     var onRemove: (ClipboardEntry) -> Void
     var onClear: () -> Void
+    var onQuit: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -297,6 +309,19 @@ struct HistoryView: View {
                 .buttonStyle(.plain)
                 .disabled(manager.history.isEmpty)
                 .opacity(manager.history.isEmpty ? 0.3 : 1)
+                Button(action: onQuit) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "power").font(.system(size: 10, weight: .medium))
+                        Text("退出").font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundColor(.white.opacity(0.5))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule().fill(.white.opacity(0.06))
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
