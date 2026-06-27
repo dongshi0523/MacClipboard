@@ -1,0 +1,7 @@
+# Build output
+macclipboard
+
+# macOS
+.DS_Store
+*.swp
+*~
